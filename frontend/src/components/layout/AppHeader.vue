@@ -12,7 +12,12 @@ const authStore = useAuthStore()
       <nav class="flex items-center gap-2 text-sm">
         <RouterLink class="rounded px-3 py-2 hover:bg-muted" to="/products">Products</RouterLink>
         <RouterLink class="rounded px-3 py-2 hover:bg-muted" to="/cart">Cart</RouterLink>
-        <RouterLink class="rounded px-3 py-2 hover:bg-muted" to="/vendor">Vendor</RouterLink>
+        <RouterLink v-if="authStore.role === 'Buyer'" class="rounded px-3 py-2 hover:bg-muted" to="/orders">
+          My Orders
+        </RouterLink>
+        <RouterLink v-if="authStore.role === 'Vendor'" class="rounded px-3 py-2 hover:bg-muted" to="/vendor">
+          Vendor
+        </RouterLink>
         <RouterLink v-if="!authStore.isAuthenticated" class="rounded px-3 py-2 hover:bg-muted" to="/login"
           >Login</RouterLink
         >

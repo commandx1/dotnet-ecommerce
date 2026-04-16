@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, shallowRef } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Card from '@/components/ui/Card.vue'
 import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const form = reactive({
   email: 'vendor@local.dev',
@@ -20,7 +21,8 @@ async function submit() {
   error.value = null
   try {
     await authStore.login(form.email, form.password)
-    await router.push('/vendor')
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : authStore.landingPath
+    await router.push(redirect)
   } catch {
     error.value = 'Giriş başarısız.'
   }
