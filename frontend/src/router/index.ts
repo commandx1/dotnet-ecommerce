@@ -48,6 +48,11 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
+  const isVendorRoute = to.path.startsWith('/vendor')
+
+  if (authStore.isAuthenticated && authStore.role === 'Vendor' && !isVendorRoute && to.name !== 'login') {
+    return '/vendor'
+  }
 
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   if (requiresAuth && !authStore.isAuthenticated) {
