@@ -1,0 +1,28 @@
+# local agent state
+.agents/
+
+# macOS
+.DS_Store
+
+# dotenv
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+
+# node
+node_modules/
+frontend/node_modules/
+
+# frontend artifacts
+frontend/dist/
+
+# dotnet artifacts
+**/bin/
+**/obj/
+
+# IDE
+.vscode/
+.idea/
