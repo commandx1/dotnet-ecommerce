@@ -19,7 +19,7 @@ async function loadQuestions() {
   try {
     questions.value = await getVendorQuestions()
   } catch (requestError) {
-    error.value = getApiErrorMessage(requestError, 'Vendor soruları yüklenemedi.')
+    error.value = getApiErrorMessage(requestError, 'Unable to load vendor questions.')
   } finally {
     loading.value = false
   }
@@ -40,7 +40,7 @@ async function sendAnswer(questionId: string) {
 
     drafts[questionId] = ''
   } catch (requestError) {
-    error.value = getApiErrorMessage(requestError, 'Soru cevabı gönderilemedi.')
+    error.value = getApiErrorMessage(requestError, 'Unable to send the answer.')
   }
 }
 
@@ -51,11 +51,11 @@ onMounted(async () => {
 
 <template>
   <section class="space-y-4">
-    <h2 class="text-2xl font-semibold">Vendor Soru-Cevap Yönetimi</h2>
+    <h2 class="text-2xl font-semibold">Vendor Q&amp;A Management</h2>
 
-    <Card v-if="loading">Yükleniyor...</Card>
+    <Card v-if="loading">Loading...</Card>
     <Card v-else-if="error">{{ error }}</Card>
-    <Card v-else-if="questions.length === 0">Henüz soru yok.</Card>
+    <Card v-else-if="questions.length === 0">No questions yet.</Card>
 
     <Card v-for="question in questions" :key="question.id" class="space-y-4">
       <div class="space-y-1">
@@ -63,12 +63,12 @@ onMounted(async () => {
       </div>
 
       <div v-if="question.answerText" class="rounded bg-muted p-3 text-sm">
-        <span class="font-medium">Mevcut cevap:</span> {{ question.answerText }}
+        <span class="font-medium">Current answer:</span> {{ question.answerText }}
       </div>
 
       <div class="space-y-2">
-        <Input v-model="drafts[question.id]" placeholder="Soruyu cevaplayın" />
-        <Button @click="sendAnswer(question.id)">Cevap Gönder</Button>
+        <Input v-model="drafts[question.id]" placeholder="Write an answer to this question" />
+        <Button @click="sendAnswer(question.id)">Send Answer</Button>
       </div>
     </Card>
   </section>

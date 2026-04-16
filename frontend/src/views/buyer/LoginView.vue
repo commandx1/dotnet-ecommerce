@@ -28,7 +28,7 @@ const registerForm = reactive({
 const error = shallowRef<string | null>(null)
 const sessionNotice = computed(() =>
   route.query.reason === 'session-expired'
-    ? 'Oturumunuz sonlandı. Lütfen tekrar giriş yapın.'
+    ? 'Your session has expired. Please sign in again.'
     : null
 )
 
@@ -44,7 +44,7 @@ async function submit() {
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : authStore.landingPath
     await router.push(redirect)
   } catch (requestError) {
-    error.value = getApiErrorMessage(requestError, 'Kimlik doğrulama işlemi başarısız.')
+    error.value = getApiErrorMessage(requestError, 'Authentication failed.')
   }
 }
 </script>
@@ -52,21 +52,21 @@ async function submit() {
 <template>
   <Card class="mx-auto max-w-md space-y-4">
     <div class="flex items-center justify-between gap-2">
-      <h2 class="text-2xl font-semibold">{{ mode === 'login' ? 'Giriş' : 'Kayıt Ol' }}</h2>
+      <h2 class="text-2xl font-semibold">{{ mode === 'login' ? 'Sign In' : 'Create Account' }}</h2>
       <div class="inline-flex rounded-lg border border-border bg-muted/70 p-1 text-sm">
         <button
           class="rounded-md px-3 py-1.5"
           :class="mode === 'login' ? 'bg-white shadow-sm' : 'text-muted-foreground'"
           @click="mode = 'login'"
         >
-          Giriş
+          Sign In
         </button>
         <button
           class="rounded-md px-3 py-1.5"
           :class="mode === 'register' ? 'bg-white shadow-sm' : 'text-muted-foreground'"
           @click="mode = 'register'"
         >
-          Kayıt
+          Register
         </button>
       </div>
     </div>
@@ -76,19 +76,19 @@ async function submit() {
     </p>
 
     <template v-if="mode === 'login'">
-      <Input v-model="loginForm.email" placeholder="E-posta" />
-      <Input v-model="loginForm.password" type="password" placeholder="Şifre" />
+      <Input v-model="loginForm.email" placeholder="Email" />
+      <Input v-model="loginForm.password" type="password" placeholder="Password" />
       <label class="flex items-center gap-2 text-sm text-slate-700">
         <input v-model="loginForm.rememberMe" type="checkbox" class="h-4 w-4 rounded border-border" />
-        Beni hatırla
+        Remember me
       </label>
     </template>
 
     <template v-else>
-      <Input v-model="registerForm.email" placeholder="E-posta" />
-      <Input v-model="registerForm.password" type="password" placeholder="Şifre" />
+      <Input v-model="registerForm.email" placeholder="Email" />
+      <Input v-model="registerForm.password" type="password" placeholder="Password" />
       <label class="space-y-2 text-sm">
-        <span class="text-muted-foreground">Rol</span>
+        <span class="text-muted-foreground">Role</span>
         <select
           v-model="registerForm.role"
           class="h-10 w-full rounded-md border border-border bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -99,7 +99,7 @@ async function submit() {
       </label>
     </template>
 
-    <Button :class="'w-full'" @click="submit">{{ mode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur' }}</Button>
+    <Button :class="'w-full'" @click="submit">{{ mode === 'login' ? 'Sign In' : 'Create Account' }}</Button>
     <p v-if="error" class="text-sm text-rose-600">{{ error }}</p>
   </Card>
 </template>

@@ -48,7 +48,7 @@ async function loadProductData() {
     reviews.value = reviewData
     questions.value = questionData
   } catch (requestError) {
-    actionError.value = getApiErrorMessage(requestError, 'Ürün detayı yüklenemedi.')
+    actionError.value = getApiErrorMessage(requestError, 'Unable to load product details.')
   } finally {
     loading.value = false
   }
@@ -56,7 +56,7 @@ async function loadProductData() {
 
 async function submitReview() {
   if (!reviewComment.value.trim()) {
-    actionError.value = 'Yorum metni boş olamaz.'
+    actionError.value = 'Review text cannot be empty.'
     return
   }
 
@@ -73,9 +73,9 @@ async function submitReview() {
     reviews.value = await getProductReviews(productId.value)
     reviewComment.value = ''
     reviewRating.value = '5'
-    feedback.value = 'Yorum eklendi.'
+    feedback.value = 'Review submitted successfully.'
   } catch (requestError) {
-    actionError.value = getApiErrorMessage(requestError, 'Yorum eklenemedi.')
+    actionError.value = getApiErrorMessage(requestError, 'Unable to submit your review.')
   } finally {
     reviewSubmitting.value = false
   }
@@ -83,7 +83,7 @@ async function submitReview() {
 
 async function submitQuestion() {
   if (!questionText.value.trim()) {
-    actionError.value = 'Soru metni boş olamaz.'
+    actionError.value = 'Question text cannot be empty.'
     return
   }
 
@@ -98,9 +98,9 @@ async function submitQuestion() {
 
     questions.value = await getProductQuestions(productId.value)
     questionText.value = ''
-    feedback.value = 'Soru gönderildi.'
+    feedback.value = 'Question submitted successfully.'
   } catch (requestError) {
-    actionError.value = getApiErrorMessage(requestError, 'Soru gönderilemedi.')
+    actionError.value = getApiErrorMessage(requestError, 'Unable to submit your question.')
   } finally {
     questionSubmitting.value = false
   }
@@ -112,7 +112,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Card v-if="loading">Yükleniyor...</Card>
+  <Card v-if="loading">Loading...</Card>
 
   <section v-else-if="product" class="space-y-6">
     <Card class="space-y-6">
@@ -122,7 +122,7 @@ onMounted(async () => {
       </div>
       <div class="flex items-center justify-between">
         <span class="text-xl font-bold">{{ format(product.price) }}</span>
-        <Button @click="cartStore.addToCart(product)">Sepete Ekle</Button>
+        <Button @click="cartStore.addToCart(product)">Add to Cart</Button>
       </div>
     </Card>
 
@@ -131,9 +131,9 @@ onMounted(async () => {
 
     <div class="grid gap-6 lg:grid-cols-2">
       <Card class="space-y-4">
-        <h3 class="text-lg font-semibold">Yorum Yaz</h3>
+        <h3 class="text-lg font-semibold">Write a Review</h3>
         <div class="space-y-2">
-          <label class="text-sm text-muted-foreground" for="review-rating">Puan (1-5)</label>
+          <label class="text-sm text-muted-foreground" for="review-rating">Rating (1-5)</label>
           <input
             id="review-rating"
             v-model="reviewRating"
@@ -144,7 +144,7 @@ onMounted(async () => {
           />
         </div>
         <div class="space-y-2">
-          <label class="text-sm text-muted-foreground" for="review-comment">Yorum</label>
+          <label class="text-sm text-muted-foreground" for="review-comment">Review</label>
           <textarea
             id="review-comment"
             v-model="reviewComment"
@@ -153,14 +153,14 @@ onMounted(async () => {
           />
         </div>
         <Button :disabled="reviewSubmitting" @click="submitReview">
-          {{ reviewSubmitting ? 'Gönderiliyor...' : 'Yorum Gönder' }}
+          {{ reviewSubmitting ? 'Submitting...' : 'Submit Review' }}
         </Button>
       </Card>
 
       <Card class="space-y-4">
-        <h3 class="text-lg font-semibold">Soru Sor</h3>
+        <h3 class="text-lg font-semibold">Ask a Question</h3>
         <div class="space-y-2">
-          <label class="text-sm text-muted-foreground" for="question-text">Soru</label>
+          <label class="text-sm text-muted-foreground" for="question-text">Question</label>
           <textarea
             id="question-text"
             v-model="questionText"
@@ -169,41 +169,41 @@ onMounted(async () => {
           />
         </div>
         <Button :disabled="questionSubmitting" @click="submitQuestion">
-          {{ questionSubmitting ? 'Gönderiliyor...' : 'Soru Gönder' }}
+          {{ questionSubmitting ? 'Submitting...' : 'Submit Question' }}
         </Button>
       </Card>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">
       <Card class="space-y-4">
-        <h3 class="text-lg font-semibold">Yorumlar</h3>
-        <p v-if="reviews.length === 0" class="text-sm text-muted-foreground">Henüz yorum yok.</p>
+        <h3 class="text-lg font-semibold">Reviews</h3>
+        <p v-if="reviews.length === 0" class="text-sm text-muted-foreground">No reviews yet.</p>
         <ul v-else class="space-y-3">
           <li v-for="review in reviews" :key="review.id" class="rounded-md border border-border p-3">
-            <p class="text-sm font-semibold">Puan: {{ review.rating }}/5</p>
+            <p class="text-sm font-semibold">Rating: {{ review.rating }}/5</p>
             <p class="mt-1 text-sm">{{ review.comment }}</p>
             <p v-if="review.replyText" class="mt-2 rounded bg-muted p-2 text-sm">
-              <span class="font-medium">Vendor cevabı:</span> {{ review.replyText }}
+              <span class="font-medium">Vendor reply:</span> {{ review.replyText }}
             </p>
           </li>
         </ul>
       </Card>
 
       <Card class="space-y-4">
-        <h3 class="text-lg font-semibold">Sorular</h3>
-        <p v-if="questions.length === 0" class="text-sm text-muted-foreground">Henüz soru yok.</p>
+        <h3 class="text-lg font-semibold">Questions</h3>
+        <p v-if="questions.length === 0" class="text-sm text-muted-foreground">No questions yet.</p>
         <ul v-else class="space-y-3">
           <li v-for="question in questions" :key="question.id" class="rounded-md border border-border p-3">
             <p class="text-sm">{{ question.questionText }}</p>
             <p v-if="question.answerText" class="mt-2 rounded bg-muted p-2 text-sm">
-              <span class="font-medium">Vendor cevabı:</span> {{ question.answerText }}
+              <span class="font-medium">Vendor reply:</span> {{ question.answerText }}
             </p>
-            <p v-else class="mt-2 text-xs text-muted-foreground">Henüz cevaplanmadı.</p>
+            <p v-else class="mt-2 text-xs text-muted-foreground">No answer yet.</p>
           </li>
         </ul>
       </Card>
     </div>
   </section>
 
-  <Card v-else>Ürün bulunamadı.</Card>
+  <Card v-else>Product not found.</Card>
 </template>

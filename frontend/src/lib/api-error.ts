@@ -16,7 +16,7 @@ function flattenErrors(input: unknown): string[] {
   return []
 }
 
-export function getApiErrorMessage(error: unknown, fallback = 'İşlem sırasında bir hata oluştu.'): string {
+export function getApiErrorMessage(error: unknown, fallback = 'Something went wrong while processing your request.'): string {
   if (!axios.isAxiosError(error)) {
     if (error instanceof Error && error.message.trim()) {
       return error.message
@@ -36,7 +36,7 @@ export function getApiErrorMessage(error: unknown, fallback = 'İşlem sırasın
     | undefined
 
   if (!error.response) {
-    return 'Sunucuya ulaşılamadı. Ağ bağlantınızı kontrol edin.'
+    return 'Unable to reach the server. Please check your network connection.'
   }
 
   if (typeof responseData === 'string' && responseData.trim()) {
@@ -56,19 +56,19 @@ export function getApiErrorMessage(error: unknown, fallback = 'İşlem sırasın
   }
 
   if (error.response.status === 401) {
-    return 'Oturum doğrulanamadı. Lütfen tekrar giriş yapın.'
+    return 'Your session could not be verified. Please sign in again.'
   }
 
   if (error.response.status === 403) {
-    return 'Bu işlem için yetkiniz yok.'
+    return 'You do not have permission to perform this action.'
   }
 
   if (error.response.status === 404) {
-    return 'İstenen kaynak bulunamadı.'
+    return 'The requested resource could not be found.'
   }
 
   if (error.response.status === 429) {
-    return 'Çok fazla istek gönderdiniz. Lütfen biraz sonra tekrar deneyin.'
+    return 'Too many requests. Please try again in a moment.'
   }
 
   return fallback

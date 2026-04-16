@@ -37,7 +37,7 @@ async function submit() {
     form.price = '0'
     form.stock = '0'
   } catch (requestError) {
-    formError.value = getApiErrorMessage(requestError, 'Ürün kaydı başarısız.')
+    formError.value = getApiErrorMessage(requestError, 'Unable to save the product.')
   }
 }
 </script>
@@ -45,25 +45,25 @@ async function submit() {
 <template>
   <section class="space-y-6">
     <Card class="space-y-3">
-      <h2 class="text-lg font-semibold">Yeni Ürün</h2>
-      <Input v-model="form.name" placeholder="Ürün adı" />
-      <Input v-model="form.description" placeholder="Açıklama" />
+      <h2 class="text-lg font-semibold">New Product</h2>
+      <Input v-model="form.name" placeholder="Product name" />
+      <Input v-model="form.description" placeholder="Description" />
       <div class="grid grid-cols-2 gap-2">
-        <Input v-model="form.price" type="number" placeholder="Fiyat" />
-        <Input v-model="form.stock" type="number" placeholder="Stok" />
+        <Input v-model="form.price" type="number" placeholder="Price" />
+        <Input v-model="form.stock" type="number" placeholder="Stock" />
       </div>
-      <Button @click="submit">Kaydet</Button>
+      <Button @click="submit">Save</Button>
       <p v-if="formError" class="text-sm text-rose-600">{{ formError }}</p>
     </Card>
 
     <Card>
-      <h2 class="mb-4 text-lg font-semibold">Ürünlerim</h2>
-      <div v-if="vendorStore.loading" class="text-sm text-muted-foreground">Yükleniyor...</div>
+      <h2 class="mb-4 text-lg font-semibold">My Products</h2>
+      <div v-if="vendorStore.loading" class="text-sm text-muted-foreground">Loading...</div>
       <ul v-else class="space-y-3">
         <li v-for="product in vendorStore.products" :key="product.id" class="flex items-center justify-between">
           <div>
             <p class="font-medium">{{ product.name }}</p>
-            <p class="text-sm text-muted-foreground">Stok: {{ product.stock }}</p>
+            <p class="text-sm text-muted-foreground">Stock: {{ product.stock }}</p>
           </div>
           <p class="font-semibold">{{ format(product.price) }}</p>
         </li>

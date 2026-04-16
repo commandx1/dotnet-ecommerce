@@ -15,6 +15,6 @@ export function showToast(payload: ToastPayload) {
   window.dispatchEvent(new CustomEvent<ToastPayload>(APP_TOAST_EVENT, { detail: payload }))
 }
 
-export function showErrorToast(message: string, title = 'Hata') {
+export function showErrorToast(message: string, title = 'Error') {
   showToast({ title, message, variant: 'error' })
 }

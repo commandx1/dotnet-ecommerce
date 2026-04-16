@@ -96,10 +96,10 @@ function handleCvcInput(value: string) {
 
 const fieldErrors = computed(() => ({
   cardHolder:
-    form.cardHolder.trim().length >= 3 ? null : 'Kart üzerindeki isim en az 3 karakter olmalıdır.',
-  cardNumber: isValidCardNumber(form.cardNumber) ? null : 'Geçerli bir kart numarası girin.',
-  expiry: isValidExpiry(form.expiry) ? null : 'Son kullanma tarihi geçersiz veya geçmiş.',
-  cvc: /^\d{3,4}$/.test(form.cvc.trim()) ? null : 'CVC 3 veya 4 hane olmalıdır.'
+    form.cardHolder.trim().length >= 3 ? null : 'Cardholder name must be at least 3 characters long.',
+  cardNumber: isValidCardNumber(form.cardNumber) ? null : 'Enter a valid card number.',
+  expiry: isValidExpiry(form.expiry) ? null : 'Expiry date is invalid or already in the past.',
+  cvc: /^\d{3,4}$/.test(form.cvc.trim()) ? null : 'CVC must be 3 or 4 digits.'
 }))
 
 const isFormValid = computed(() =>
@@ -108,12 +108,12 @@ const isFormValid = computed(() =>
 
 async function submit() {
   if (!isFormValid.value) {
-    error.value = 'Kart formundaki hataları düzeltin.'
+    error.value = 'Please fix the errors in the payment form.'
     return
   }
 
   if (cartStore.items.length === 0) {
-    error.value = 'Sepet boş olduğu için checkout yapılamadı.'
+    error.value = 'Checkout could not be completed because your cart is empty.'
     return
   }
 
@@ -131,7 +131,7 @@ async function submit() {
     submitted.value = true
     cartStore.clear()
   } catch (requestError) {
-    error.value = getApiErrorMessage(requestError, 'Checkout başarısız.')
+    error.value = getApiErrorMessage(requestError, 'Checkout failed.')
   } finally {
     submitting.value = false
   }
@@ -140,15 +140,15 @@ async function submit() {
 
 <template>
   <Card class="mx-auto max-w-xl space-y-4">
-    <h2 class="text-2xl font-semibold">Checkout (Dummy)</h2>
-    <p class="text-sm text-muted-foreground">Gerçek ödeme entegrasyonu yoktur. Bu ekran yalnızca validasyonlu mock formdur.</p>
+    <h2 class="text-2xl font-semibold">Checkout (Mock)</h2>
+    <p class="text-sm text-muted-foreground">There is no live payment integration yet. This screen is a validated mock checkout form.</p>
 
     <div class="space-y-3">
-      <Input v-model="form.cardHolder" placeholder="Kart Üzerindeki İsim" />
+      <Input v-model="form.cardHolder" placeholder="Name on Card" />
       <p v-if="fieldErrors.cardHolder" class="text-xs text-rose-600">{{ fieldErrors.cardHolder }}</p>
       <Input
         :model-value="form.cardNumber"
-        placeholder="Kart Numarası (16 hane)"
+        placeholder="Card Number (16 digits)"
         @update:model-value="handleCardNumberInput"
       />
       <p v-if="fieldErrors.cardNumber" class="text-xs text-rose-600">{{ fieldErrors.cardNumber }}</p>
@@ -166,17 +166,17 @@ async function submit() {
 
     <div class="rounded border border-border bg-muted p-3 text-sm">
       <div class="flex items-center justify-between">
-        <span class="text-muted-foreground">Sipariş Toplamı</span>
+        <span class="text-muted-foreground">Order Total</span>
         <span class="font-semibold">{{ format(cartStore.total) }}</span>
       </div>
     </div>
 
     <Button :class="'w-full'" :disabled="submitting || !isFormValid" @click="submit">
-      {{ submitting ? 'Gönderiliyor...' : 'Siparişi Onayla' }}
+      {{ submitting ? 'Submitting...' : 'Place Order' }}
     </Button>
 
     <p v-if="submitted" class="text-sm text-emerald-600">
-      Sipariş oluşturuldu. Order ID: <span class="font-mono">{{ orderId }}</span>
+      Order created successfully. Order ID: <span class="font-mono">{{ orderId }}</span>
     </p>
     <p v-if="error" class="text-sm text-rose-600">{{ error }}</p>
   </Card>

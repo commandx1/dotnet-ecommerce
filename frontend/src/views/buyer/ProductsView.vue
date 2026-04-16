@@ -19,10 +19,10 @@ onMounted(async () => {
   <section class="space-y-6">
     <header class="flex items-center justify-between">
       <h2 class="text-2xl font-semibold">Products ({{ catalogStore.productCount }})</h2>
-      <p class="text-sm text-muted-foreground">Canlı veri API üzerinden gelir.</p>
+      <p class="text-sm text-muted-foreground">Live catalog data is loaded from the API.</p>
     </header>
 
-    <div v-if="catalogStore.loading" class="text-sm text-muted-foreground">Yükleniyor...</div>
+    <div v-if="catalogStore.loading" class="text-sm text-muted-foreground">Loading...</div>
 
     <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <Card v-for="product in catalogStore.products" :key="product.id" class="space-y-4">
@@ -34,9 +34,9 @@ onMounted(async () => {
           <span class="text-sm font-semibold">{{ format(product.price) }}</span>
           <div class="flex gap-2">
             <RouterLink :to="`/products/${product.id}`">
-              <Button variant="outline" size="sm">Detay</Button>
+              <Button variant="outline" size="sm">Details</Button>
             </RouterLink>
-            <Button size="sm" @click="cartStore.addToCart(product)">Sepete Ekle</Button>
+            <Button size="sm" @click="cartStore.addToCart(product)">Add to Cart</Button>
           </div>
         </div>
       </Card>

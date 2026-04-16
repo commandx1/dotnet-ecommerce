@@ -32,7 +32,7 @@ async function loadOrders() {
   try {
     orders.value = await getMyOrders()
   } catch (requestError) {
-    error.value = getApiErrorMessage(requestError, 'Sipariş geçmişi yüklenemedi.')
+    error.value = getApiErrorMessage(requestError, 'Unable to load your order history.')
   } finally {
     loading.value = false
   }
@@ -46,13 +46,13 @@ onMounted(async () => {
 <template>
   <section class="space-y-4">
     <div class="flex items-center justify-between">
-      <h2 class="text-2xl font-semibold">Sipariş Geçmişim</h2>
-      <Button variant="outline" size="sm" @click="loadOrders">Yenile</Button>
+      <h2 class="text-2xl font-semibold">My Orders</h2>
+      <Button variant="outline" size="sm" @click="loadOrders">Refresh</Button>
     </div>
 
-    <Card v-if="loading">Yükleniyor...</Card>
+    <Card v-if="loading">Loading...</Card>
     <Card v-else-if="error">{{ error }}</Card>
-    <Card v-else-if="orders.length === 0">Henüz siparişiniz yok.</Card>
+    <Card v-else-if="orders.length === 0">You do not have any orders yet.</Card>
 
     <Card v-for="order in orders" :key="order.id" class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
@@ -61,7 +61,7 @@ onMounted(async () => {
           <p class="font-mono text-sm">{{ order.id }}</p>
         </div>
         <div class="space-y-1 text-right">
-          <p class="text-sm text-muted-foreground">Durum</p>
+          <p class="text-sm text-muted-foreground">Status</p>
           <p class="font-semibold">{{ statusLabel(order.status) }}</p>
         </div>
       </div>
@@ -74,7 +74,7 @@ onMounted(async () => {
       </ul>
 
       <div class="flex items-center justify-between border-t border-border pt-3 text-sm">
-        <span class="text-muted-foreground">Toplam</span>
+        <span class="text-muted-foreground">Total</span>
         <span class="font-semibold">{{ format(order.totalAmount) }}</span>
       </div>
     </Card>

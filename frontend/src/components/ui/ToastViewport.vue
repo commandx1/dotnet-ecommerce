@@ -83,7 +83,7 @@ onUnmounted(() => {
             <p class="text-sm text-muted-foreground">{{ toast.message }}</p>
           </div>
           <button class="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted" @click="removeToast(toast.id)">
-            Kapat
+            Close
           </button>
         </div>
       </article>

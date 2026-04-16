@@ -30,7 +30,7 @@ onMounted(async () => {
   try {
     orders.value = await getVendorOrders()
   } catch (requestError) {
-    error.value = getApiErrorMessage(requestError, 'Vendor siparişleri alınamadı.')
+    error.value = getApiErrorMessage(requestError, 'Unable to load vendor orders.')
   } finally {
     loading.value = false
   }
@@ -39,11 +39,11 @@ onMounted(async () => {
 
 <template>
   <section class="space-y-4">
-    <h2 class="text-2xl font-semibold">Vendor Sipariş Takibi</h2>
+    <h2 class="text-2xl font-semibold">Vendor Order Tracking</h2>
 
-    <Card v-if="loading">Yükleniyor...</Card>
+    <Card v-if="loading">Loading...</Card>
     <Card v-else-if="error">{{ error }}</Card>
-    <Card v-else-if="orders.length === 0">Henüz sipariş yok.</Card>
+    <Card v-else-if="orders.length === 0">No orders yet.</Card>
 
     <Card v-for="order in orders" :key="order.id" class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
@@ -52,13 +52,13 @@ onMounted(async () => {
           <p class="font-mono text-sm">{{ order.id }}</p>
         </div>
         <div class="space-y-1 text-right">
-          <p class="text-sm text-muted-foreground">Durum</p>
+          <p class="text-sm text-muted-foreground">Status</p>
           <p class="font-semibold">{{ statusLabel(order.status) }}</p>
         </div>
       </div>
 
       <div class="space-y-2 border-t border-border pt-3">
-        <p class="text-sm text-muted-foreground">Vendor itemleri</p>
+        <p class="text-sm text-muted-foreground">Vendor items</p>
         <ul class="space-y-2 text-sm">
           <li v-for="(item, index) in order.items" :key="`${order.id}-${item.productId}-${index}`" class="flex justify-between">
             <span>Product: {{ item.productId }} (x{{ item.quantity }})</span>
@@ -68,7 +68,7 @@ onMounted(async () => {
       </div>
 
       <div class="flex items-center justify-between border-t border-border pt-3 text-sm">
-        <span class="text-muted-foreground">Vendor toplamı</span>
+        <span class="text-muted-foreground">Vendor total</span>
         <span class="font-semibold">{{ format(order.vendorTotal) }}</span>
       </div>
     </Card>

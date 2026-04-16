@@ -48,7 +48,7 @@ async function logoutAllSessions() {
           size="sm"
           @click="logoutAllSessions"
         >
-          Tüm Cihazlardan Çık
+          Sign Out Everywhere
         </Button>
       </nav>
     </div>

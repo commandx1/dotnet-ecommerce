@@ -11,23 +11,23 @@ import Button from '@/components/ui/Button.vue'
         MVP-2 STOREFRONT
       </p>
       <h2 class="display-font text-4xl leading-tight tracking-tight text-slate-800">
-        Buyer ve Vendor akışını tek omurgada birleştir.
+        Unify buyer and vendor workflows on a single commerce backbone.
       </h2>
       <p class="text-muted-foreground">
-        Dotnet API, PostgreSQL ve Vue arayüzü ile rol bazlı akışı tek komutta ayağa kaldıran e-ticaret başlangıç
-        paketi.
+        A role-aware ecommerce starter built with a .NET API, PostgreSQL, and Vue, designed to boot with a single
+        command.
       </p>
       <div class="flex flex-wrap gap-2">
-        <RouterLink to="/products"><Button>Ürünleri Gör</Button></RouterLink>
+        <RouterLink to="/products"><Button>Browse Products</Button></RouterLink>
         <RouterLink to="/vendor"><Button variant="outline">Vendor Panel</Button></RouterLink>
       </div>
     </div>
 
     <div class="rounded-2xl border border-border/80 bg-gradient-to-br from-cyan-50 to-sky-100/80 p-6">
-      <p class="text-sm font-semibold text-slate-700">Hızlı Başlangıç</p>
+      <p class="text-sm font-semibold text-slate-700">Quick Start</p>
       <ul class="mt-4 space-y-2 text-sm text-slate-700/90">
-        <li>Yeni kullanıcı oluşturmak için Login ekranından kayıt ol.</li>
-        <li>Kayıt sırasında rol seç: Buyer veya Vendor.</li>
+        <li>Create a new account from the login screen.</li>
+        <li>Select either the Buyer or Vendor role during registration.</li>
       </ul>
     </div>
   </section>

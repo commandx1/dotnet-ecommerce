@@ -31,21 +31,21 @@ async function logoutAllSessions() {
         <h1 class="display-font text-2xl font-semibold text-slate-800">Vendor Panel</h1>
         <nav class="flex flex-wrap items-center gap-2 text-sm">
           <RouterLink class="rounded-lg border border-border/90 bg-white/75 px-3 py-2 hover:bg-muted/85" to="/vendor/products">
-            Ürünler
+            Products
           </RouterLink>
           <RouterLink class="rounded-lg border border-border/90 bg-white/75 px-3 py-2 hover:bg-muted/85" to="/vendor/orders">
-            Siparişler
+            Orders
           </RouterLink>
           <RouterLink class="rounded-lg border border-border/90 bg-white/75 px-3 py-2 hover:bg-muted/85" to="/vendor/reviews">
-            Yorumlar
+            Reviews
           </RouterLink>
           <RouterLink class="rounded-lg border border-border/90 bg-white/75 px-3 py-2 hover:bg-muted/85" to="/vendor/questions">
-            Sorular
+            Questions
           </RouterLink>
           <RouterLink class="rounded-lg border border-border/90 bg-white/75 px-3 py-2 hover:bg-muted/85" to="/">Marketplace</RouterLink>
-          <Button variant="outline" size="sm" @click="logoutCurrentSession">Çıkış Yap</Button>
+          <Button variant="outline" size="sm" @click="logoutCurrentSession">Sign Out</Button>
           <Button :disabled="isRevokingAllSessions" variant="outline" size="sm" @click="logoutAllSessions">
-            Tüm Cihazlardan Çık
+            Sign Out Everywhere
           </Button>
         </nav>
       </div>
