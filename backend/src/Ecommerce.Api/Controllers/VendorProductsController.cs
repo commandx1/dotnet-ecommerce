@@ -1,4 +1,4 @@
-using System.Security.Claims;
+using Ecommerce.Api.Common;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Application.Abstractions.Storage;
 using Ecommerce.Application.Features.Products.Commands;
@@ -26,7 +26,7 @@ public sealed class VendorProductsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetVendorProducts(CancellationToken cancellationToken)
     {
-        var vendorId = GetVendorId();
+        var vendorId = User.GetRequiredUserId();
         var result = await _sender.Send(new GetVendorProductsQuery(vendorId), cancellationToken);
         return Ok(result);
     }
@@ -37,7 +37,7 @@ public sealed class VendorProductsController : ControllerBase
     {
         var imageUrl = await SaveImageIfUploadedAsync(request.Image, cancellationToken);
         var command = new CreateVendorProductCommand(
-            GetVendorId(),
+            User.GetRequiredUserId(),
             request.Name,
             request.Description,
             request.Price,
@@ -55,7 +55,7 @@ public sealed class VendorProductsController : ControllerBase
         var imageUrl = await SaveImageIfUploadedAsync(request.Image, cancellationToken);
 
         var command = new UpdateVendorProductCommand(
-            GetVendorId(),
+            User.GetRequiredUserId(),
             id,
             request.Name,
             request.Description,
@@ -70,19 +70,8 @@ public sealed class VendorProductsController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        await _sender.Send(new DeleteVendorProductCommand(GetVendorId(), id), cancellationToken);
+        await _sender.Send(new DeleteVendorProductCommand(User.GetRequiredUserId(), id), cancellationToken);
         return NoContent();
-    }
-
-    private Guid GetVendorId()
-    {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-        if (!Guid.TryParse(value, out var vendorId))
-        {
-            throw new UnauthorizedAccessException("Invalid token subject.");
-        }
-
-        return vendorId;
     }
 
     private async Task<string?> SaveImageIfUploadedAsync(IFormFile? image, CancellationToken cancellationToken)

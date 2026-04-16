@@ -28,6 +28,13 @@ public sealed class ProductRepository : Repository<Product>, IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Product>> GetByIdsAsync(IReadOnlyCollection<Guid> productIds, CancellationToken cancellationToken = default)
+    {
+        return await Query()
+            .Where(product => productIds.Contains(product.Id))
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<Product?> GetByIdForVendorAsync(Guid productId, Guid vendorId, CancellationToken cancellationToken = default)
     {
         return Query()

@@ -6,5 +6,6 @@ public interface IProductRepository : IRepository<Product>
 {
     Task<IReadOnlyList<Product>> GetPublicProductsAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Product>> GetByVendorAsync(Guid vendorId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Product>> GetByIdsAsync(IReadOnlyCollection<Guid> productIds, CancellationToken cancellationToken = default);
     Task<Product?> GetByIdForVendorAsync(Guid productId, Guid vendorId, CancellationToken cancellationToken = default);
 }
