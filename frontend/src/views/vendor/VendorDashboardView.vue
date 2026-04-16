@@ -10,8 +10,9 @@ import Card from '@/components/ui/Card.vue'
     </Card>
     <Card>
       <h2 class="text-lg font-semibold">Hızlı Eylemler</h2>
-      <div class="mt-3">
+      <div class="mt-3 flex flex-col gap-2">
         <RouterLink class="text-sm font-medium text-primary underline" to="/vendor/products">Ürün Yönetimine Git</RouterLink>
+        <RouterLink class="text-sm font-medium text-primary underline" to="/vendor/orders">Sipariş Takibini Aç</RouterLink>
       </div>
     </Card>
   </section>

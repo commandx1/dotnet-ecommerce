@@ -8,6 +8,7 @@ import CartView from '@/views/buyer/CartView.vue'
 import CheckoutView from '@/views/buyer/CheckoutView.vue'
 import LoginView from '@/views/buyer/LoginView.vue'
 import VendorDashboardView from '@/views/vendor/VendorDashboardView.vue'
+import VendorOrdersView from '@/views/vendor/VendorOrdersView.vue'
 import VendorProductsView from '@/views/vendor/VendorProductsView.vue'
 
 const router = createRouter({
@@ -30,7 +31,8 @@ const router = createRouter({
       component: VendorLayout,
       children: [
         { path: '', name: 'vendor-dashboard', component: VendorDashboardView },
-        { path: 'products', name: 'vendor-products', component: VendorProductsView }
+        { path: 'products', name: 'vendor-products', component: VendorProductsView },
+        { path: 'orders', name: 'vendor-orders', component: VendorOrdersView }
       ]
     }
   ]
