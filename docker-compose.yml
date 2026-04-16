@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecommerce-postgres
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrator:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ecommerce-migrator
+    command: ["dotnet", "Ecommerce.Api.dll", "--migrate"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=ecommerce;Username=postgres;Password=postgres
+      Jwt__Issuer: Ecommerce.Api
+      Jwt__Audience: Ecommerce.Client
+      Jwt__Key: dev-super-secret-key-at-least-32-characters-long
+      Jwt__AccessTokenMinutes: 30
+      Jwt__RefreshTokenDays: 7
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ecommerce-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=ecommerce;Username=postgres;Password=postgres
+      Jwt__Issuer: Ecommerce.Api
+      Jwt__Audience: Ecommerce.Client
+      Jwt__Key: dev-super-secret-key-at-least-32-characters-long
+      Jwt__AccessTokenMinutes: 30
+      Jwt__RefreshTokenDays: 7
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    volumes:
+      - backend-assets:/app/wwwroot/assets
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: ecommerce-frontend
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres-data:
+  backend-assets:

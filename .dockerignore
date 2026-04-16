@@ -1,0 +1,8 @@
+.git
+.gitignore
+.agents
+**/bin
+**/obj
+frontend/node_modules
+frontend/dist
+node_modules
