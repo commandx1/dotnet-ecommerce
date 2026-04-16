@@ -25,19 +25,19 @@ async function logoutAllSessions() {
 </script>
 
 <template>
-  <header class="border-b border-border bg-white/90 backdrop-blur">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-      <RouterLink class="text-lg font-semibold" to="/">Dotnet Ecommerce</RouterLink>
-      <nav class="flex items-center gap-2 text-sm">
-        <RouterLink class="rounded px-3 py-2 hover:bg-muted" to="/products">Products</RouterLink>
-        <RouterLink class="rounded px-3 py-2 hover:bg-muted" to="/cart">Cart</RouterLink>
-        <RouterLink v-if="authStore.role === 'Buyer'" class="rounded px-3 py-2 hover:bg-muted" to="/orders">
+  <header class="sticky top-0 z-40 border-b border-border/80 bg-white/75 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3">
+      <RouterLink class="display-font text-xl font-semibold text-slate-800" to="/">Dotnet Commerce</RouterLink>
+      <nav class="flex flex-wrap items-center gap-2 text-sm">
+        <RouterLink class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/products">Products</RouterLink>
+        <RouterLink class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/cart">Cart</RouterLink>
+        <RouterLink v-if="authStore.role === 'Buyer'" class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/orders">
           My Orders
         </RouterLink>
-        <RouterLink v-if="authStore.role === 'Vendor'" class="rounded px-3 py-2 hover:bg-muted" to="/vendor">
+        <RouterLink v-if="authStore.role === 'Vendor'" class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/vendor">
           Vendor
         </RouterLink>
-        <RouterLink v-if="!authStore.isAuthenticated" class="rounded px-3 py-2 hover:bg-muted" to="/login"
+        <RouterLink v-if="!authStore.isAuthenticated" class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/login"
           >Login</RouterLink
         >
         <Button v-else variant="outline" size="sm" @click="logoutCurrentSession">Logout</Button>

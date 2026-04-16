@@ -1,19 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 210 25% 98%;
-  --foreground: 220 18% 12%;
-  --muted: 210 20% 92%;
-  --muted-foreground: 220 10% 40%;
+  --background: 201 38% 97%;
+  --foreground: 211 34% 14%;
+  --muted: 201 34% 91%;
+  --muted-foreground: 214 13% 35%;
   --card: 0 0% 100%;
-  --border: 215 20% 85%;
-  --primary: 212 84% 44%;
+  --border: 206 29% 82%;
+  --primary: 196 82% 37%;
   --primary-foreground: 210 40% 98%;
-  --radius: 0.75rem;
+  --radius: 0.9rem;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
 }
 
 body {
   @apply bg-background text-foreground antialiased;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  background-image:
+    radial-gradient(circle at 0% 0%, hsl(196 90% 92%) 0%, transparent 35%),
+    radial-gradient(circle at 100% 20%, hsl(198 65% 88%) 0%, transparent 32%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(201 40% 96%));
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+.display-font {
+  font-family: 'Fraunces', 'Times New Roman', serif;
+}
+
+::selection {
+  background: hsl(196 82% 37% / 0.2);
 }
