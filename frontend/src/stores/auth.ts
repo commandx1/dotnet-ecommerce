@@ -5,6 +5,7 @@ import { decodeAuthContext, type UserRole } from '@/lib/jwt'
 import {
   AUTH_SESSION_CLEARED_EVENT,
   AUTH_SESSION_UPDATED_EVENT,
+  type SessionPersistence,
   clearSessionFromStorage,
   readSessionFromStorage,
   writeSessionToStorage
@@ -21,8 +22,12 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => Boolean(accessToken.value))
   const landingPath = computed(() => (role.value === 'Vendor' ? '/vendor' : '/orders'))
 
-  function applySession(newAccessToken: string, newRefreshToken: string) {
-    writeSessionToStorage(newAccessToken, newRefreshToken)
+  function applySession(
+    newAccessToken: string,
+    newRefreshToken: string,
+    persistence: SessionPersistence = 'persistent'
+  ) {
+    writeSessionToStorage(newAccessToken, newRefreshToken, persistence)
     syncFromStorage()
   }
 
@@ -44,9 +49,9 @@ export const useAuthStore = defineStore('auth', () => {
     userId.value = context.userId
   }
 
-  async function login(email: string, password: string) {
+  async function login(email: string, password: string, rememberMe = false) {
     const response = await authApi.login(email, password)
-    applySession(response.accessToken, response.refreshToken)
+    applySession(response.accessToken, response.refreshToken, rememberMe ? 'persistent' : 'session')
   }
 
   async function register(email: string, password: string, selectedRole: 'Buyer' | 'Vendor') {

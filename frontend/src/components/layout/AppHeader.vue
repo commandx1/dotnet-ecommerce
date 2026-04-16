@@ -1,8 +1,27 @@
 <script setup lang="ts">
+import { shallowRef } from 'vue'
 import Button from '@/components/ui/Button.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
+const isRevokingAllSessions = shallowRef(false)
+
+async function logoutCurrentSession() {
+  await authStore.logout()
+}
+
+async function logoutAllSessions() {
+  if (isRevokingAllSessions.value) {
+    return
+  }
+
+  isRevokingAllSessions.value = true
+  try {
+    await authStore.logout({ revokeAllSessions: true })
+  } finally {
+    isRevokingAllSessions.value = false
+  }
+}
 </script>
 
 <template>
@@ -21,7 +40,16 @@ const authStore = useAuthStore()
         <RouterLink v-if="!authStore.isAuthenticated" class="rounded px-3 py-2 hover:bg-muted" to="/login"
           >Login</RouterLink
         >
-        <Button v-else variant="outline" size="sm" @click="authStore.logout">Logout</Button>
+        <Button v-else variant="outline" size="sm" @click="logoutCurrentSession">Logout</Button>
+        <Button
+          v-if="authStore.isAuthenticated"
+          :disabled="isRevokingAllSessions"
+          variant="outline"
+          size="sm"
+          @click="logoutAllSessions"
+        >
+          Tüm Cihazlardan Çık
+        </Button>
       </nav>
     </div>
   </header>

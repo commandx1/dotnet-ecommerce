@@ -1,5 +1,10 @@
 import axios, { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios'
-import { clearSessionFromStorage, readSessionFromStorage, writeSessionToStorage } from '@/lib/session'
+import {
+  clearSessionFromStorage,
+  emitSessionExpiredEvent,
+  readSessionFromStorage,
+  writeSessionToStorage
+} from '@/lib/session'
 import type { AuthResponse } from './authApi'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '/api'
@@ -47,10 +52,11 @@ async function refreshSession(): Promise<AuthResponse | null> {
       refreshToken: currentSession.refreshToken
     })
 
-    writeSessionToStorage(data.accessToken, data.refreshToken)
+    writeSessionToStorage(data.accessToken, data.refreshToken, currentSession.persistence)
     return data
   } catch {
     clearSessionFromStorage()
+    emitSessionExpiredEvent()
     return null
   }
 }

@@ -1,4 +1,28 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { shallowRef } from 'vue'
+import Button from '@/components/ui/Button.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+const isRevokingAllSessions = shallowRef(false)
+
+async function logoutCurrentSession() {
+  await authStore.logout()
+}
+
+async function logoutAllSessions() {
+  if (isRevokingAllSessions.value) {
+    return
+  }
+
+  isRevokingAllSessions.value = true
+  try {
+    await authStore.logout({ revokeAllSessions: true })
+  } finally {
+    isRevokingAllSessions.value = false
+  }
+}
+</script>
 
 <template>
   <div class="min-h-screen bg-background">
@@ -19,6 +43,10 @@
             Sorular
           </RouterLink>
           <RouterLink class="rounded border border-border px-3 py-2 hover:bg-muted" to="/">Marketplace</RouterLink>
+          <Button variant="outline" size="sm" @click="logoutCurrentSession">Çıkış Yap</Button>
+          <Button :disabled="isRevokingAllSessions" variant="outline" size="sm" @click="logoutAllSessions">
+            Tüm Cihazlardan Çık
+          </Button>
         </nav>
       </div>
     </header>
