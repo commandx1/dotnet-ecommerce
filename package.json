@@ -1,0 +1,27 @@
+{
+  "name": "dotnet-ecommerce-tooling",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "typecheck:frontend": "npm --prefix frontend run typecheck",
+    "format:backend:check": "dotnet format backend/src/Ecommerce.Api/Ecommerce.Api.csproj --verify-no-changes",
+    "format:backend": "dotnet format backend/src/Ecommerce.Api/Ecommerce.Api.csproj"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.5",
+    "prettier": "^3.3.2"
+  },
+  "lint-staged": {
+    "frontend/**/*.{ts,vue}": [
+      "npm --prefix frontend run lint"
+    ],
+    "*.{md,json,yml,yaml}": [
+      "prettier --check"
+    ]
+  }
+}
