@@ -17,10 +17,10 @@ import Button from '@/components/ui/Button.vue'
       </div>
     </div>
     <div class="rounded-lg border border-border bg-gradient-to-br from-white to-slate-100 p-6">
-      <p class="text-sm font-medium">Seed kullanıcılar</p>
+      <p class="text-sm font-medium">Hızlı Başlangıç</p>
       <ul class="mt-4 space-y-2 text-sm text-muted-foreground">
-        <li>`buyer@local.dev / Passw0rd!`</li>
-        <li>`vendor@local.dev / Passw0rd!`</li>
+        <li>Yeni kullanıcı oluşturmak için Login ekranından kayıt ol.</li>
+        <li>Kayıt sırasında rol seç: Buyer veya Vendor.</li>
       </ul>
     </div>
   </section>

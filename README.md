@@ -18,10 +18,11 @@ Uygulama uçları:
 - Frontend: `http://localhost:5173`
 - API: compose ağı içinde `http://api:8080` (frontend `/api` proxy ile erişir)
 
-## Seed Kullanıcılar
+## Kullanıcı Başlangıcı
 
-- Buyer: `buyer@local.dev` / `Passw0rd!`
-- Vendor: `vendor@local.dev` / `Passw0rd!`
+- Uygulama seed kullanıcı üretmez.
+- Kullanıcılar `Register` akışıyla sıfırdan oluşturulur.
+- Kayıtta rol seçimi: `Buyer` veya `Vendor`.
 
 ## Lokal Geliştirme
 
