@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { shallowRef } from 'vue'
+import { useRouter } from 'vue-router'
 import Button from '@/components/ui/Button.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const isRevokingAllSessions = shallowRef(false)
 
 async function logoutCurrentSession() {
   await authStore.logout()
+  await router.push({ name: 'login' })
 }
 
 async function logoutAllSessions() {
@@ -18,6 +21,7 @@ async function logoutAllSessions() {
   isRevokingAllSessions.value = true
   try {
     await authStore.logout({ revokeAllSessions: true })
+    await router.push({ name: 'login' })
   } finally {
     isRevokingAllSessions.value = false
   }
