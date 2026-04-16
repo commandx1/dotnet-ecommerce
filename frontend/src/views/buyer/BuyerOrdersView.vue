@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button.vue'
 import { getMyOrders } from '@/api/ordersApi'
 import type { BuyerOrder } from '@/types/order'
 import { useCurrency } from '@/composables/useCurrency'
+import { getApiErrorMessage } from '@/lib/api-error'
 
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -30,8 +31,8 @@ async function loadOrders() {
 
   try {
     orders.value = await getMyOrders()
-  } catch {
-    error.value = 'Sipariş geçmişi yüklenemedi. Buyer hesabı ile giriş yapın.'
+  } catch (requestError) {
+    error.value = getApiErrorMessage(requestError, 'Sipariş geçmişi yüklenemedi.')
   } finally {
     loading.value = false
   }

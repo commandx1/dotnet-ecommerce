@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import Card from '@/components/ui/Card.vue'
 import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
 import { useVendorProductsStore } from '@/stores/vendorProducts'
 import { useCurrency } from '@/composables/useCurrency'
+import { getApiErrorMessage } from '@/lib/api-error'
 
 const vendorStore = useVendorProductsStore()
 const { format } = useCurrency()
+const formError = ref<string | null>(null)
 
 const form = reactive({
   name: '',
@@ -21,17 +23,22 @@ onMounted(async () => {
 })
 
 async function submit() {
-  await vendorStore.createProduct({
-    name: form.name,
-    description: form.description,
-    price: Number(form.price),
-    stock: Number(form.stock)
-  })
+  formError.value = null
+  try {
+    await vendorStore.createProduct({
+      name: form.name,
+      description: form.description,
+      price: Number(form.price),
+      stock: Number(form.stock)
+    })
 
-  form.name = ''
-  form.description = ''
-  form.price = '0'
-  form.stock = '0'
+    form.name = ''
+    form.description = ''
+    form.price = '0'
+    form.stock = '0'
+  } catch (requestError) {
+    formError.value = getApiErrorMessage(requestError, 'Ürün kaydı başarısız.')
+  }
 }
 </script>
 
@@ -46,6 +53,7 @@ async function submit() {
         <Input v-model="form.stock" type="number" placeholder="Stok" />
       </div>
       <Button @click="submit">Kaydet</Button>
+      <p v-if="formError" class="text-sm text-rose-600">{{ formError }}</p>
     </Card>
 
     <Card>

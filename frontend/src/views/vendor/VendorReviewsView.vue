@@ -5,6 +5,7 @@ import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
 import { getVendorReviews, replyToReview } from '@/api/reviewsApi'
 import type { Review } from '@/types/review'
+import { getApiErrorMessage } from '@/lib/api-error'
 
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -17,8 +18,8 @@ async function loadReviews() {
 
   try {
     reviews.value = await getVendorReviews()
-  } catch {
-    error.value = 'Vendor yorumları yüklenemedi.'
+  } catch (requestError) {
+    error.value = getApiErrorMessage(requestError, 'Vendor yorumları yüklenemedi.')
   } finally {
     loading.value = false
   }
@@ -38,8 +39,8 @@ async function sendReply(reviewId: string) {
     }
 
     drafts[reviewId] = ''
-  } catch {
-    error.value = 'Yorum cevabı gönderilemedi.'
+  } catch (requestError) {
+    error.value = getApiErrorMessage(requestError, 'Yorum cevabı gönderilemedi.')
   }
 }
 

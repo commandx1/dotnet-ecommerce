@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
 import { useCartStore } from '@/stores/cart'
 import { useCurrency } from '@/composables/useCurrency'
+import { getApiErrorMessage } from '@/lib/api-error'
 
 const route = useRoute()
 const cartStore = useCartStore()
@@ -46,8 +47,8 @@ async function loadProductData() {
     product.value = productData
     reviews.value = reviewData
     questions.value = questionData
-  } catch {
-    actionError.value = 'Ürün detayı yüklenemedi.'
+  } catch (requestError) {
+    actionError.value = getApiErrorMessage(requestError, 'Ürün detayı yüklenemedi.')
   } finally {
     loading.value = false
   }
@@ -73,8 +74,8 @@ async function submitReview() {
     reviewComment.value = ''
     reviewRating.value = '5'
     feedback.value = 'Yorum eklendi.'
-  } catch {
-    actionError.value = 'Yorum eklenemedi. Buyer hesabı ile tekrar deneyin.'
+  } catch (requestError) {
+    actionError.value = getApiErrorMessage(requestError, 'Yorum eklenemedi.')
   } finally {
     reviewSubmitting.value = false
   }
@@ -98,8 +99,8 @@ async function submitQuestion() {
     questions.value = await getProductQuestions(productId.value)
     questionText.value = ''
     feedback.value = 'Soru gönderildi.'
-  } catch {
-    actionError.value = 'Soru gönderilemedi. Buyer hesabı ile tekrar deneyin.'
+  } catch (requestError) {
+    actionError.value = getApiErrorMessage(requestError, 'Soru gönderilemedi.')
   } finally {
     questionSubmitting.value = false
   }

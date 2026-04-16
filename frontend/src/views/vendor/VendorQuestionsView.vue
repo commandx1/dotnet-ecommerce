@@ -5,6 +5,7 @@ import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
 import { answerQuestion, getVendorQuestions } from '@/api/questionsApi'
 import type { Question } from '@/types/question'
+import { getApiErrorMessage } from '@/lib/api-error'
 
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -17,8 +18,8 @@ async function loadQuestions() {
 
   try {
     questions.value = await getVendorQuestions()
-  } catch {
-    error.value = 'Vendor soruları yüklenemedi.'
+  } catch (requestError) {
+    error.value = getApiErrorMessage(requestError, 'Vendor soruları yüklenemedi.')
   } finally {
     loading.value = false
   }
@@ -38,8 +39,8 @@ async function sendAnswer(questionId: string) {
     }
 
     drafts[questionId] = ''
-  } catch {
-    error.value = 'Soru cevabı gönderilemedi.'
+  } catch (requestError) {
+    error.value = getApiErrorMessage(requestError, 'Soru cevabı gönderilemedi.')
   }
 }
 

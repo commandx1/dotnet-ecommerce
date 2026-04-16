@@ -5,6 +5,8 @@ import {
   readSessionFromStorage,
   writeSessionToStorage
 } from '@/lib/session'
+import { getApiErrorMessage } from '@/lib/api-error'
+import { showErrorToast } from '@/lib/toast'
 import type { AuthResponse } from './authApi'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '/api'
@@ -12,6 +14,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '/api'
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean
   skipAuthRefresh?: boolean
+  suppressErrorToast?: boolean
 }
 
 const refreshClient = axios.create({
@@ -78,15 +81,23 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    const rejectWithToast = (requestConfig?: RetryableRequestConfig) => {
+      if (!requestConfig?.suppressErrorToast) {
+        showErrorToast(getApiErrorMessage(error))
+      }
+
+      return Promise.reject(error)
+    }
+
     const originalRequest = error.config as RetryableRequestConfig | undefined
     const status = error.response?.status
 
     if (!originalRequest || status !== 401 || originalRequest.skipAuthRefresh || originalRequest._retry) {
-      return Promise.reject(error)
+      return rejectWithToast(originalRequest)
     }
 
     if (isAuthEndpoint(originalRequest.url)) {
-      return Promise.reject(error)
+      return rejectWithToast(originalRequest)
     }
 
     originalRequest._retry = true
@@ -99,7 +110,7 @@ apiClient.interceptors.response.use(
 
     const refreshedTokens = await refreshPromise
     if (!refreshedTokens) {
-      return Promise.reject(error)
+      return rejectWithToast(originalRequest)
     }
 
     if (!originalRequest.headers) {

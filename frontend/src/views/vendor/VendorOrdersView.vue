@@ -4,6 +4,7 @@ import Card from '@/components/ui/Card.vue'
 import { getVendorOrders } from '@/api/ordersApi'
 import type { VendorOrder } from '@/types/order'
 import { useCurrency } from '@/composables/useCurrency'
+import { getApiErrorMessage } from '@/lib/api-error'
 
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -28,8 +29,8 @@ onMounted(async () => {
   error.value = null
   try {
     orders.value = await getVendorOrders()
-  } catch {
-    error.value = 'Vendor siparişleri alınamadı. Vendor hesabı ile giriş yapın.'
+  } catch (requestError) {
+    error.value = getApiErrorMessage(requestError, 'Vendor siparişleri alınamadı.')
   } finally {
     loading.value = false
   }

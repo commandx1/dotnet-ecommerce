@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
 import { useCartStore } from '@/stores/cart'
 import { useCurrency } from '@/composables/useCurrency'
+import { getApiErrorMessage } from '@/lib/api-error'
 
 const cartStore = useCartStore()
 const { format } = useCurrency()
@@ -129,8 +130,8 @@ async function submit() {
     orderId.value = result.orderId
     submitted.value = true
     cartStore.clear()
-  } catch {
-    error.value = 'Checkout başarısız. Buyer hesabı ile tekrar deneyin.'
+  } catch (requestError) {
+    error.value = getApiErrorMessage(requestError, 'Checkout başarısız.')
   } finally {
     submitting.value = false
   }
