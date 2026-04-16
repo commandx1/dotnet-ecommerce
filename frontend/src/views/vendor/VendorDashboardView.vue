@@ -13,6 +13,8 @@ import Card from '@/components/ui/Card.vue'
       <div class="mt-3 flex flex-col gap-2">
         <RouterLink class="text-sm font-medium text-primary underline" to="/vendor/products">Ürün Yönetimine Git</RouterLink>
         <RouterLink class="text-sm font-medium text-primary underline" to="/vendor/orders">Sipariş Takibini Aç</RouterLink>
+        <RouterLink class="text-sm font-medium text-primary underline" to="/vendor/reviews">Yorum Yönetimini Aç</RouterLink>
+        <RouterLink class="text-sm font-medium text-primary underline" to="/vendor/questions">Soru-Cevap Yönetimini Aç</RouterLink>
       </div>
     </Card>
   </section>

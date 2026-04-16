@@ -12,6 +12,12 @@
           <RouterLink class="rounded border border-border px-3 py-2 hover:bg-muted" to="/vendor/orders">
             Siparişler
           </RouterLink>
+          <RouterLink class="rounded border border-border px-3 py-2 hover:bg-muted" to="/vendor/reviews">
+            Yorumlar
+          </RouterLink>
+          <RouterLink class="rounded border border-border px-3 py-2 hover:bg-muted" to="/vendor/questions">
+            Sorular
+          </RouterLink>
           <RouterLink class="rounded border border-border px-3 py-2 hover:bg-muted" to="/">Marketplace</RouterLink>
         </nav>
       </div>

@@ -10,6 +10,8 @@ import LoginView from '@/views/buyer/LoginView.vue'
 import VendorDashboardView from '@/views/vendor/VendorDashboardView.vue'
 import VendorOrdersView from '@/views/vendor/VendorOrdersView.vue'
 import VendorProductsView from '@/views/vendor/VendorProductsView.vue'
+import VendorQuestionsView from '@/views/vendor/VendorQuestionsView.vue'
+import VendorReviewsView from '@/views/vendor/VendorReviewsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -32,7 +34,9 @@ const router = createRouter({
       children: [
         { path: '', name: 'vendor-dashboard', component: VendorDashboardView },
         { path: 'products', name: 'vendor-products', component: VendorProductsView },
-        { path: 'orders', name: 'vendor-orders', component: VendorOrdersView }
+        { path: 'orders', name: 'vendor-orders', component: VendorOrdersView },
+        { path: 'reviews', name: 'vendor-reviews', component: VendorReviewsView },
+        { path: 'questions', name: 'vendor-questions', component: VendorQuestionsView }
       ]
     }
   ]
