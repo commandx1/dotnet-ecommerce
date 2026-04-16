@@ -1,0 +1,98 @@
+using System.Security.Claims;
+using Ecommerce.Api.Contracts;
+using Ecommerce.Application.Abstractions.Storage;
+using Ecommerce.Application.Features.Products.Commands;
+using Ecommerce.Application.Features.Products.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Ecommerce.Api.Controllers;
+
+[ApiController]
+[Authorize(Roles = "Vendor")]
+[Route("api/vendor/products")]
+public sealed class VendorProductsController : ControllerBase
+{
+    private readonly ISender _sender;
+    private readonly IImageStorageService _imageStorageService;
+
+    public VendorProductsController(ISender sender, IImageStorageService imageStorageService)
+    {
+        _sender = sender;
+        _imageStorageService = imageStorageService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetVendorProducts(CancellationToken cancellationToken)
+    {
+        var vendorId = GetVendorId();
+        var result = await _sender.Send(new GetVendorProductsQuery(vendorId), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [RequestSizeLimit(10_000_000)]
+    public async Task<IActionResult> Create([FromForm] CreateVendorProductRequest request, CancellationToken cancellationToken)
+    {
+        var imageUrl = await SaveImageIfUploadedAsync(request.Image, cancellationToken);
+        var command = new CreateVendorProductCommand(
+            GetVendorId(),
+            request.Name,
+            request.Description,
+            request.Price,
+            request.Stock,
+            imageUrl);
+
+        var result = await _sender.Send(command, cancellationToken);
+        return CreatedAtAction(nameof(CatalogController.GetProductById), "Catalog", new { id = result.Id }, result);
+    }
+
+    [HttpPut("{id:guid}")]
+    [RequestSizeLimit(10_000_000)]
+    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateVendorProductRequest request, CancellationToken cancellationToken)
+    {
+        var imageUrl = await SaveImageIfUploadedAsync(request.Image, cancellationToken);
+
+        var command = new UpdateVendorProductCommand(
+            GetVendorId(),
+            id,
+            request.Name,
+            request.Description,
+            request.Price,
+            request.Stock,
+            imageUrl);
+
+        var result = await _sender.Send(command, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _sender.Send(new DeleteVendorProductCommand(GetVendorId(), id), cancellationToken);
+        return NoContent();
+    }
+
+    private Guid GetVendorId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (!Guid.TryParse(value, out var vendorId))
+        {
+            throw new UnauthorizedAccessException("Invalid token subject.");
+        }
+
+        return vendorId;
+    }
+
+    private async Task<string?> SaveImageIfUploadedAsync(IFormFile? image, CancellationToken cancellationToken)
+    {
+        if (image is null || image.Length == 0)
+        {
+            return null;
+        }
+
+        await using var stream = image.OpenReadStream();
+        return await _imageStorageService.SaveImageAsync(stream, image.FileName, cancellationToken);
+    }
+}
