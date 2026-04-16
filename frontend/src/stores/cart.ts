@@ -10,6 +10,8 @@ interface CartItem {
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([])
 
+  const itemCount = computed(() => items.value.reduce((accumulator, item) => accumulator + item.quantity, 0))
+
   const total = computed(() =>
     items.value.reduce((accumulator, item) => accumulator + item.product.price * item.quantity, 0)
   )
@@ -34,6 +36,7 @@ export const useCartStore = defineStore('cart', () => {
 
   return {
     items,
+    itemCount,
     total,
     addToCart,
     removeFromCart,

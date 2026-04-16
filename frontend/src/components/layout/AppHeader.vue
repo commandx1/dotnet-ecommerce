@@ -3,8 +3,10 @@ import { shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from '@/components/ui/Button.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useCartStore } from '@/stores/cart'
 
 const authStore = useAuthStore()
+const cartStore = useCartStore()
 const router = useRouter()
 const isRevokingAllSessions = shallowRef(false)
 
@@ -34,7 +36,17 @@ async function logoutAllSessions() {
       <RouterLink class="display-font text-xl font-semibold text-slate-800" to="/">Dotnet Commerce</RouterLink>
       <nav class="flex flex-wrap items-center gap-2 text-sm">
         <RouterLink class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/products">Products</RouterLink>
-        <RouterLink class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/cart">Cart</RouterLink>
+        <RouterLink class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/cart">
+          <span class="inline-flex items-center gap-2">
+            <span>Cart</span>
+            <span
+              v-if="cartStore.itemCount > 0"
+              class="inline-flex min-w-5 items-center justify-center rounded-full bg-slate-900 px-1.5 py-0.5 text-xs font-semibold text-white"
+            >
+              {{ cartStore.itemCount }}
+            </span>
+          </span>
+        </RouterLink>
         <RouterLink v-if="authStore.role === 'Buyer'" class="rounded-lg px-3 py-2 hover:bg-muted/85" to="/orders">
           My Orders
         </RouterLink>
