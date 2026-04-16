@@ -1,3 +1,4 @@
+using Ecommerce.Api.Common;
 using FluentValidation;
 using System.Text.Json;
 
@@ -22,39 +23,49 @@ public sealed class GlobalExceptionMiddleware
         }
         catch (ValidationException validationException)
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            context.Response.ContentType = "application/json";
-
-            var payload = new
-            {
-                message = "Validation error",
-                errors = validationException.Errors.Select(x => x.ErrorMessage)
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(payload));
+            await WriteErrorAsync(
+                context,
+                StatusCodes.Status400BadRequest,
+                "Validation error.",
+                validationException.Errors.Select(x => x.ErrorMessage).ToArray());
+        }
+        catch (BadHttpRequestException badHttpRequestException)
+        {
+            _logger.LogWarning(badHttpRequestException, "Invalid HTTP request.");
+            await WriteErrorAsync(context, StatusCodes.Status400BadRequest, badHttpRequestException.Message);
+        }
+        catch (InvalidOperationException invalidOperationException)
+        {
+            _logger.LogWarning(invalidOperationException, "Invalid operation rejected.");
+            await WriteErrorAsync(context, StatusCodes.Status400BadRequest, invalidOperationException.Message);
         }
         catch (UnauthorizedAccessException unauthorizedException)
         {
             _logger.LogWarning(unauthorizedException, "Unauthorized request blocked.");
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await WriteErrorAsync(context, StatusCodes.Status401Unauthorized, "Unauthorized request.");
         }
         catch (KeyNotFoundException keyNotFoundException)
         {
             _logger.LogWarning(keyNotFoundException, "Requested resource not found.");
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await WriteErrorAsync(context, StatusCodes.Status404NotFound, "Requested resource was not found.");
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Unhandled exception occurred.");
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "application/json";
-
-            var payload = new
-            {
-                message = "An unexpected error occurred."
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(payload));
+            await WriteErrorAsync(context, StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
+    }
+
+    private static Task WriteErrorAsync(
+        HttpContext context,
+        int statusCode,
+        string message,
+        IReadOnlyList<string>? errors = null)
+    {
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
+
+        var payload = new ApiErrorResponse(message, errors, context.TraceIdentifier);
+        return context.Response.WriteAsync(JsonSerializer.Serialize(payload));
     }
 }

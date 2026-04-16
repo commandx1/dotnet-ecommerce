@@ -5,6 +5,8 @@ namespace Ecommerce.Infrastructure.Storage;
 
 public sealed class LocalImageStorageService : IImageStorageService
 {
+    private const long MaxImageBytes = 5_000_000;
+
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg",
@@ -38,9 +40,18 @@ public sealed class LocalImageStorageService : IImageStorageService
         var safeExtension = extension.ToLowerInvariant();
         var fileName = $"{Guid.NewGuid():N}{safeExtension}";
         var filePath = Path.Combine(_assetsDirectory, fileName);
+        await using var buffered = new MemoryStream();
+        await content.CopyToAsync(buffered, cancellationToken);
+
+        if (buffered.Length == 0 || buffered.Length > MaxImageBytes)
+        {
+            throw new InvalidOperationException("Image size must be between 1 byte and 5MB.");
+        }
+
+        buffered.Position = 0;
 
         await using var output = File.Create(filePath);
-        await content.CopyToAsync(output, cancellationToken);
+        await buffered.CopyToAsync(output, cancellationToken);
 
         return $"/assets/{fileName}";
     }

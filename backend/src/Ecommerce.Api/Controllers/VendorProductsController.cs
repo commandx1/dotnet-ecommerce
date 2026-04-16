@@ -14,6 +14,14 @@ namespace Ecommerce.Api.Controllers;
 [Route("api/vendor/products")]
 public sealed class VendorProductsController : ControllerBase
 {
+    private const long MaxImageBytes = 5_000_000;
+    private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    };
+
     private readonly ISender _sender;
     private readonly IImageStorageService _imageStorageService;
 
@@ -79,6 +87,16 @@ public sealed class VendorProductsController : ControllerBase
         if (image is null || image.Length == 0)
         {
             return null;
+        }
+
+        if (image.Length > MaxImageBytes)
+        {
+            throw new BadHttpRequestException("Image size must be 5MB or less.");
+        }
+
+        if (string.IsNullOrWhiteSpace(image.ContentType) || !AllowedContentTypes.Contains(image.ContentType))
+        {
+            throw new BadHttpRequestException("Only image/jpeg, image/png, and image/webp are allowed.");
         }
 
         await using var stream = image.OpenReadStream();
