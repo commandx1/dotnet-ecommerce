@@ -1,3 +1,4 @@
+using Ecommerce.Api.Common;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Application.Abstractions.Auth;
 using Ecommerce.Application.Abstractions.Persistence;
@@ -119,6 +120,43 @@ public sealed class AuthController : ControllerBase
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Ok(new AuthResponse(tokenPair.AccessToken, tokenPair.RefreshToken, tokenPair.RefreshTokenExpiresAt));
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout(LogoutRequest request, CancellationToken cancellationToken)
+    {
+        var userId = User.GetRequiredUserId();
+        var now = DateTimeOffset.UtcNow;
+
+        if (request.RevokeAllSessions || string.IsNullOrWhiteSpace(request.RefreshToken))
+        {
+            var activeTokens = await _refreshTokenRepository.GetActiveByUserIdAsync(userId, cancellationToken);
+            foreach (var token in activeTokens)
+            {
+                token.RevokedAt = now;
+                _refreshTokenRepository.Update(token);
+            }
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return NoContent();
+        }
+
+        var refreshTokenHash = _jwtTokenService.HashRefreshToken(request.RefreshToken);
+        var tokenEntity = await _refreshTokenRepository.GetByTokenHashAsync(refreshTokenHash, cancellationToken);
+        if (tokenEntity is null || tokenEntity.UserId != userId)
+        {
+            return NoContent();
+        }
+
+        if (tokenEntity.RevokedAt is null)
+        {
+            tokenEntity.RevokedAt = now;
+            _refreshTokenRepository.Update(tokenEntity);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        return NoContent();
     }
 
     private async Task<ActionResult<AuthResponse>> IssueTokensAsync(ApplicationUser user, CancellationToken cancellationToken)

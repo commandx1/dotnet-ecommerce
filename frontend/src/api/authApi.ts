@@ -1,6 +1,6 @@
 import { apiClient } from './client'
 
-interface AuthResponse {
+export interface AuthResponse {
   accessToken: string
   refreshToken: string
   refreshTokenExpiresAt: string
@@ -19,4 +19,8 @@ export async function register(email: string, password: string, role: 'Buyer' | 
 export async function refresh(refreshToken: string) {
   const { data } = await apiClient.post<AuthResponse>('/auth/refresh', { refreshToken })
   return data
+}
+
+export async function logout(refreshToken: string | null, revokeAllSessions = false) {
+  await apiClient.post('/auth/logout', { refreshToken, revokeAllSessions }, { skipAuthRefresh: true } as any)
 }

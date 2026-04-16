@@ -15,4 +15,13 @@ public sealed class RefreshTokenRepository : Repository<RefreshToken>, IRefreshT
     {
         return Query().FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<RefreshToken>> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        return await Query()
+            .Where(x => x.UserId == userId && x.RevokedAt == null && x.ExpiresAt > now)
+            .ToListAsync(cancellationToken);
+    }
 }
