@@ -41,7 +41,10 @@ public sealed class AuthController : ControllerBase
         var normalizedRole = request.Role.Trim();
         if (!AllowedRoles.Contains(normalizedRole, StringComparer.OrdinalIgnoreCase))
         {
-            return BadRequest("Role must be Buyer or Vendor.");
+            return BadRequest(new ApiErrorResponse(
+                "Registration failed.",
+                ["Role must be Buyer or Vendor."],
+                HttpContext.TraceIdentifier));
         }
 
         var user = new ApplicationUser
@@ -53,13 +56,13 @@ public sealed class AuthController : ControllerBase
         var createResult = await _userManager.CreateAsync(user, request.Password);
         if (!createResult.Succeeded)
         {
-            return BadRequest(createResult.Errors);
+            return ToIdentityError(createResult, "Registration failed.");
         }
 
         var roleResult = await _userManager.AddToRoleAsync(user, normalizedRole);
         if (!roleResult.Succeeded)
         {
-            return BadRequest(roleResult.Errors);
+            return ToIdentityError(roleResult, "Registration failed.");
         }
 
         return await IssueTokensAsync(user, cancellationToken);
@@ -72,13 +75,19 @@ public sealed class AuthController : ControllerBase
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == request.Email.Trim(), cancellationToken);
         if (user is null)
         {
-            return Unauthorized();
+            return Unauthorized(new ApiErrorResponse(
+                "Authentication failed.",
+                ["Invalid email or password."],
+                HttpContext.TraceIdentifier));
         }
 
         var validPassword = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!validPassword)
         {
-            return Unauthorized();
+            return Unauthorized(new ApiErrorResponse(
+                "Authentication failed.",
+                ["Invalid email or password."],
+                HttpContext.TraceIdentifier));
         }
 
         return await IssueTokensAsync(user, cancellationToken);
@@ -93,13 +102,19 @@ public sealed class AuthController : ControllerBase
 
         if (existing is null || !existing.IsActive(DateTimeOffset.UtcNow))
         {
-            return Unauthorized();
+            return Unauthorized(new ApiErrorResponse(
+                "Authentication failed.",
+                ["Refresh token is invalid or expired."],
+                HttpContext.TraceIdentifier));
         }
 
         var user = await _userManager.FindByIdAsync(existing.UserId.ToString());
         if (user is null)
         {
-            return Unauthorized();
+            return Unauthorized(new ApiErrorResponse(
+                "Authentication failed.",
+                ["Refresh token is invalid or expired."],
+                HttpContext.TraceIdentifier));
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -157,6 +172,14 @@ public sealed class AuthController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    private BadRequestObjectResult ToIdentityError(IdentityResult identityResult, string message)
+    {
+        return BadRequest(new ApiErrorResponse(
+            message,
+            identityResult.Errors.Select(error => error.Description).ToArray(),
+            HttpContext.TraceIdentifier));
     }
 
     private async Task<ActionResult<AuthResponse>> IssueTokensAsync(ApplicationUser user, CancellationToken cancellationToken)

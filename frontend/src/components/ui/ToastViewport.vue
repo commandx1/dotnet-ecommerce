@@ -6,6 +6,7 @@ interface ToastItem {
   id: string
   title: string
   message: string
+  items: string[]
   variant: 'error' | 'success' | 'info'
 }
 
@@ -28,6 +29,7 @@ function enqueueToast(payload: ToastPayload) {
     id,
     title: payload.title,
     message: payload.message,
+    items: payload.items ?? [],
     variant: payload.variant ?? 'info'
   }
 
@@ -81,6 +83,9 @@ onUnmounted(() => {
               {{ toast.title }}
             </p>
             <p class="text-sm text-muted-foreground">{{ toast.message }}</p>
+            <ul v-if="toast.items.length > 0" class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+              <li v-for="item in toast.items" :key="item">{{ item }}</li>
+            </ul>
           </div>
           <button class="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted" @click="removeToast(toast.id)">
             Close

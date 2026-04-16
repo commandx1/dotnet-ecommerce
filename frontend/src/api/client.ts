@@ -5,7 +5,7 @@ import {
   readSessionFromStorage,
   writeSessionToStorage
 } from '@/lib/session'
-import { getApiErrorMessage } from '@/lib/api-error'
+import { resolveApiError } from '@/lib/api-error'
 import { showErrorToast } from '@/lib/toast'
 import type { AuthResponse } from './authApi'
 
@@ -83,7 +83,8 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const rejectWithToast = (requestConfig?: RetryableRequestConfig) => {
       if (!requestConfig?.suppressErrorToast) {
-        showErrorToast(getApiErrorMessage(error))
+        const resolvedError = resolveApiError(error)
+        showErrorToast(resolvedError.message, 'Error', resolvedError.items)
       }
 
       return Promise.reject(error)
