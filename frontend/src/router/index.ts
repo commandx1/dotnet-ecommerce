@@ -13,6 +13,7 @@ import VendorOrdersView from '@/views/vendor/VendorOrdersView.vue'
 import VendorProductsView from '@/views/vendor/VendorProductsView.vue'
 import VendorQuestionsView from '@/views/vendor/VendorQuestionsView.vue'
 import VendorReviewsView from '@/views/vendor/VendorReviewsView.vue'
+import { validateSession } from '@/api/authApi'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -46,17 +47,32 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-  const isVendorRoute = to.path.startsWith('/vendor')
-
-  if (authStore.isAuthenticated && authStore.role === 'Vendor' && !isVendorRoute && to.name !== 'login') {
-    return '/vendor'
-  }
 
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   if (requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+
+  if (requiresAuth && authStore.isAuthenticated) {
+    try {
+      await validateSession()
+    } catch {
+      authStore.clearSession()
+      return {
+        name: 'login',
+        query: {
+          redirect: to.fullPath,
+          reason: 'session-expired'
+        }
+      }
+    }
+  }
+
+  const isVendorRoute = to.path.startsWith('/vendor')
+  if (authStore.isAuthenticated && authStore.role === 'Vendor' && !isVendorRoute && to.name !== 'login') {
+    return '/vendor'
   }
 
   const guestOnly = to.matched.some((record) => record.meta.guestOnly)

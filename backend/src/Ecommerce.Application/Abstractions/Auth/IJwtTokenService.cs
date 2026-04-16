@@ -4,6 +4,6 @@ public sealed record TokenPair(string AccessToken, string RefreshToken, DateTime
 
 public interface IJwtTokenService
 {
-    TokenPair GenerateTokenPair(Guid userId, string email, IEnumerable<string> roles);
+    TokenPair GenerateTokenPair(Guid userId, string email, IEnumerable<string> roles, string? securityStamp);
     string HashRefreshToken(string refreshToken);
 }

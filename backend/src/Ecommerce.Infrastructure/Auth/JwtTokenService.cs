@@ -17,11 +17,14 @@ public sealed class JwtTokenService : IJwtTokenService
         _jwtOptions = jwtOptions.Value;
     }
 
-    public TokenPair GenerateTokenPair(Guid userId, string email, IEnumerable<string> roles)
+    public TokenPair GenerateTokenPair(Guid userId, string email, IEnumerable<string> roles, string? securityStamp)
     {
         var now = DateTimeOffset.UtcNow;
         var accessTokenExpiresAt = now.AddMinutes(_jwtOptions.AccessTokenMinutes);
         var refreshTokenExpiresAt = now.AddDays(_jwtOptions.RefreshTokenDays);
+        var effectiveSecurityStamp = string.IsNullOrWhiteSpace(securityStamp)
+            ? userId.ToString()
+            : securityStamp;
 
         var claims = new List<Claim>
         {
@@ -29,6 +32,7 @@ public sealed class JwtTokenService : IJwtTokenService
             new(JwtRegisteredClaimNames.Email, email),
             new(ClaimTypes.NameIdentifier, userId.ToString()),
             new(ClaimTypes.Email, email),
+            new(ClaimTypes.SerialNumber, effectiveSecurityStamp),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

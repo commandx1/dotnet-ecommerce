@@ -24,3 +24,7 @@ export async function refresh(refreshToken: string) {
 export async function logout(refreshToken: string | null, revokeAllSessions = false) {
   await apiClient.post('/auth/logout', { refreshToken, revokeAllSessions }, { skipAuthRefresh: true } as any)
 }
+
+export async function validateSession() {
+  await apiClient.get('/auth/session', { suppressErrorToast: true } as any)
+}

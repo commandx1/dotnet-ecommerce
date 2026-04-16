@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using Ecommerce.Api.Common;
@@ -6,10 +7,13 @@ using Ecommerce.Application;
 using Ecommerce.Api.Middleware;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Auth;
+using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -117,6 +121,33 @@ builder.Services
 
         options.Events = new JwtBearerEvents
         {
+            OnTokenValidated = async context =>
+            {
+                var principal = context.Principal;
+                var userId = principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var tokenSecurityStamp = principal?.FindFirstValue(ClaimTypes.SerialNumber);
+                if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(tokenSecurityStamp))
+                {
+                    context.Fail("Token is missing required claims.");
+                    return;
+                }
+
+                var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+                var user = await userManager.FindByIdAsync(userId);
+                if (user is null)
+                {
+                    context.Fail("User does not exist.");
+                    return;
+                }
+
+                var expectedSecurityStamp = string.IsNullOrWhiteSpace(user.SecurityStamp)
+                    ? user.Id.ToString()
+                    : user.SecurityStamp;
+                if (!string.Equals(tokenSecurityStamp, expectedSecurityStamp, StringComparison.Ordinal))
+                {
+                    context.Fail("Token has been revoked.");
+                }
+            },
             OnChallenge = async context =>
             {
                 context.HandleResponse();

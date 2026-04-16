@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
 import * as authApi from '@/api/authApi'
-import { decodeAuthContext, type UserRole } from '@/lib/jwt'
+import { decodeAuthContext, isJwtExpired, type UserRole } from '@/lib/jwt'
 import {
   AUTH_SESSION_CLEARED_EVENT,
   AUTH_SESSION_UPDATED_EVENT,
@@ -19,7 +19,18 @@ export const useAuthStore = defineStore('auth', () => {
   const role = shallowRef<NullableRole>(null)
   const userId = shallowRef<string | null>(null)
 
-  const isAuthenticated = computed(() => Boolean(accessToken.value))
+  const isAuthenticated = computed(() => {
+    if (!accessToken.value) {
+      return false
+    }
+
+    if (!isJwtExpired(accessToken.value)) {
+      return true
+    }
+
+    // Access token expired; keep session active if a refresh token still exists.
+    return Boolean(refreshToken.value)
+  })
   const landingPath = computed(() => (role.value === 'Vendor' ? '/vendor' : '/orders'))
 
   function applySession(

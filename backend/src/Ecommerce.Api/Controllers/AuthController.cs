@@ -118,7 +118,7 @@ public sealed class AuthController : ControllerBase
         }
 
         var roles = await _userManager.GetRolesAsync(user);
-        var tokenPair = _jwtTokenService.GenerateTokenPair(user.Id, user.Email!, roles);
+        var tokenPair = _jwtTokenService.GenerateTokenPair(user.Id, user.Email!, roles, user.SecurityStamp);
         var replacementHash = _jwtTokenService.HashRefreshToken(tokenPair.RefreshToken);
 
         existing.RevokedAt = DateTimeOffset.UtcNow;
@@ -154,6 +154,14 @@ public sealed class AuthController : ControllerBase
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            // Rotating security stamp immediately invalidates access tokens issued on other devices.
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is not null)
+            {
+                await _userManager.UpdateSecurityStampAsync(user);
+            }
+
             return NoContent();
         }
 
@@ -174,6 +182,13 @@ public sealed class AuthController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("session")]
+    [Authorize]
+    public IActionResult Session()
+    {
+        return NoContent();
+    }
+
     private BadRequestObjectResult ToIdentityError(IdentityResult identityResult, string message)
     {
         return BadRequest(new ApiErrorResponse(
@@ -185,7 +200,7 @@ public sealed class AuthController : ControllerBase
     private async Task<ActionResult<AuthResponse>> IssueTokensAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         var roles = await _userManager.GetRolesAsync(user);
-        var tokenPair = _jwtTokenService.GenerateTokenPair(user.Id, user.Email!, roles);
+        var tokenPair = _jwtTokenService.GenerateTokenPair(user.Id, user.Email!, roles, user.SecurityStamp);
         var refreshHash = _jwtTokenService.HashRefreshToken(tokenPair.RefreshToken);
 
         await _refreshTokenRepository.AddAsync(new RefreshToken

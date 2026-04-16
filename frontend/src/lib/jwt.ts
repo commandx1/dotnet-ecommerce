@@ -70,6 +70,36 @@ function extractUserId(payload: JwtPayload): string | null {
   return null
 }
 
+function extractExpiry(payload: JwtPayload): number | null {
+  const value = payload.exp
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return parsed
+    }
+  }
+
+  return null
+}
+
+export function isJwtExpired(token: string, nowUnixSeconds = Math.floor(Date.now() / 1000)): boolean {
+  const payload = parseJwtPayload(token)
+  if (!payload) {
+    return true
+  }
+
+  const exp = extractExpiry(payload)
+  if (!exp) {
+    return true
+  }
+
+  return exp <= nowUnixSeconds
+}
+
 export function decodeAuthContext(token: string): { role: UserRole | null; userId: string | null } {
   const payload = parseJwtPayload(token)
   if (!payload) {
